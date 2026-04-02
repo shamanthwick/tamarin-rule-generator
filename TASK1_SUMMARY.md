@@ -4,7 +4,7 @@
 
 **Student:** [Your Name]  
 **Course:** Formal Verification of Security Protocols  
-**Instructor:** Prof. Raghavendra Singh Rohit, IIT Roorkee  
+**Instructor:** Prof. Raghvendra Singh Rohit, IIT Roorkee  
 **Date:** [Submission Date]
 
 ---

@@ -1,0 +1,108 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Tamarin Protocol IR Schema",
+  "description": "Intermediate Representation for protocol sequence diagrams to be converted into Tamarin rules",
+  "type": "object",
+  "required": ["protocol_name", "roles", "steps"],
+  "properties": {
+    "protocol_name": {
+      "type": "string",
+      "description": "Name of the protocol (e.g., 'DigiLocker_Aadhar_Auth')"
+    },
+    "description": {
+      "type": "string",
+      "description": "Brief description of the protocol"
+    },
+    "roles": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "type"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Role identifier (e.g., 'D', 'A', 'User')"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["client", "server", "authority", "user"],
+            "description": "Type of role"
+          },
+          "long_term_key": {
+            "type": "string",
+            "description": "Variable name for long-term key (e.g., 'ltkD')"
+          },
+          "public_key": {
+            "type": "string",
+            "description": "Variable name for public key (e.g., 'pkD')"
+          }
+        }
+      }
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "from", "to", "message"],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Step sequence number"
+          },
+          "from": {
+            "type": "string",
+            "description": "Sender role name"
+          },
+          "to": {
+            "type": "string",
+            "description": "Receiver role name"
+          },
+          "fresh": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "Fresh values (nonces, OTPs, transaction IDs)"
+          },
+          "message": {
+            "type": "string",
+            "description": "Message content with crypto operations (aenc, sign, h, etc.)"
+          },
+          "crypto_ops": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["encrypt", "decrypt", "sign", "verify", "hash"]
+            },
+            "description": "Cryptographic operations in this step"
+          },
+          "action_fact": {
+            "type": "string",
+            "description": "Action fact to record (e.g., 'SentAuth', 'TrustEstablished')"
+          }
+        }
+      }
+    },
+    "security_properties": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "type", "description"],
+        "properties": {
+          "name": {"type": "string"},
+          "type": {
+            "type": "string",
+            "enum": ["authentication", "secrecy", "forward_secrecy", "agreement"]
+          },
+          "description": {"type": "string"}
+        }
+      }
+    },
+    "builtins": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["hashing", "asymmetric-encryption", "signing", "symmetric-encryption"]
+      },
+      "default": ["hashing", "asymmetric-encryption", "signing"]
+    }
+  }
+}

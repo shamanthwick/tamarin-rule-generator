@@ -1,234 +1,211 @@
-# Tamarin Rule Generator
+# 🤖 AI Tool for Generating Tamarin Rules from Protocol Diagrams
+
+> **Task 1 Submission** - Formal Verification of Security Protocols  
+> **IIT Roorkee** | Instructor: Prof. Raghvendra Singh Rohit
 
 [![Python 3.7+](https://img.shields.io/badge/python-3.7+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Tests](https://img.shields.io/badge/tests-5%20passed-green)](tests/test_generator.py)
-
-> **AI-powered tool that generates formal Tamarin prover models from protocol diagrams.**
-
-**Task 1 Submission:** IIT Roorkee - Formal Verification of Security Protocols
-
-**Input:** Protocol diagram (PNG, JPG, PDF)  
-**Output:** Tamarin rules (.spthy file)
 
 ---
 
-## 🎯 Task 1: AI Tool for Protocol Verification
+## 📋 What is This?
 
-This tool automatically generates **Tamarin prover rules** from **protocol sequence diagrams**.
+This is an **AI-powered tool** that automatically converts **protocol sequence diagrams** (images/PDFs) into **formal Tamarin verification models** (.spthy files).
 
-Given a protocol diagram (challenge-response, key exchange, TLS, etc.), the AI:
-1. **Parses the diagram** using OCR/vision AI
-2. **Extracts protocol structure** (roles, messages, crypto operations)
-3. **Generates Tamarin rules** for formal verification
-4. **Creates security lemmas** (authentication, secrecy)
+### The Problem
 
----
+Security protocols (like TLS, DigiLocker Aadhar auth, challenge-response) need to be **formally verified** to prove they're secure. But writing Tamarin rules manually is:
+- ❌ Time-consuming
+- ❌ Error-prone  
+- ❌ Requires expert knowledge
 
-## 🌟 Features
+### The Solution
 
-### Core Features (Always Available)
+Our AI tool **automates** this process:
 
-- ✅ **JSON-based Intermediate Representation (IR)** for protocol definitions
-- ✅ **Automatic Tamarin rule generation** from protocol steps
-- ✅ **PKI setup rules** (long-term keys, public keys)
-- ✅ **Adversary capability rules** (Dolev-Yao model)
-- ✅ **Cryptographic operation mapping** (encrypt, decrypt, sign, verify)
-- ✅ **Security property (lemma) generation** (authentication, secrecy)
-- ✅ **Based on real-world DigiLocker Aadhar authentication** model
-
-### Optional AI Features (Requires OpenAI API Key)
-
-- 🤖 **AI Semantic Inference** - Automatically detect fresh values, crypto operations
-- 🤖 **Security Property Suggestions** - LLM-suggested lemmas
-- 🤖 **Natural Language Input** - Describe protocols in plain English
-
-> **Note:** The core tool works perfectly without AI! AI features are optional enhancements.
+```
+Protocol Diagram (PNG/PDF)
+        ↓
+    [AI TOOL]
+        ↓
+Tamarin Rules (.spthy) - Ready for verification!
+```
 
 ---
 
-## 🚀 Quick Start
+## 🎯 Task 1 Objective
 
-### Installation
+**From Professor's Requirements:**
+> "Given a protocol diagram (sequence of rounds), develop an AI tool that generates the Tamarin rules for the protocol."
+
+### What This Tool Does
+
+| Input | AI Process | Output |
+|-------|------------|--------|
+| Protocol diagram (PNG, JPG, PDF) | **1. Vision AI/OCR** - Extracts text<br>**2. LLM (GPT-4)** - Infers semantics<br>**3. Template Generator** - Creates rules | Tamarin .spthy file with:<br>- All protocol rules<br>- Security lemmas<br>- Ready for verification |
+
+---
+
+## 🚀 Quick Start - How to Run
+
+### Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/tamarin-rule-generator.git
+git clone https://github.com/shamanthwick/tamarin-rule-generator.git
 cd tamarin-rule-generator
 ```
 
-### For Task 1: Diagram → Tamarin Rules
+### Step 2: Install Dependencies
 
 ```bash
-# Install dependencies for diagram parsing
+# For diagram parsing (Vision AI / OCR)
 pip install pillow opencv-python pytesseract pymupdf
 
-# Install OpenAI for AI enhancement (optional but recommended)
+# For AI enhancement (Optional but recommended)
 pip install openai
+```
+
+### Step 3: Set Up OpenAI API Key (Optional)
+
+```bash
+# Linux/Mac
 export OPENAI_API_KEY=sk-...
 
-# Run the AI tool (Task 1 main entry point)
+# Windows
+set OPENAI_API_KEY=sk-...
+```
+
+> **Note:** AI enhancement is optional. The tool works without it using template-based generation only.
+
+### Step 4: Run the AI Tool
+
+```bash
+# From diagram image (PNG, JPG)
 python task1_ai_tool.py diagram.png -o output.spthy
 
-# Or from PDF
+# From PDF diagram
 python task1_ai_tool.py protocol.pdf -o output.spthy
 
-# Or from JSON (if you have structured protocol)
+# From JSON protocol specification
 python task1_ai_tool.py protocol.json -o output.spthy
 ```
 
-### Without AI (Template-Based Only)
+### Step 5: Verify the Output
 
 ```bash
-# Works without any AI dependencies
-python main.py examples/digilocker_aadhar.json -o output/model.spthy
+# View generated Tamarin rules
+type output.spthy
 
-# Run tests
-python tests/test_generator.py
+# Verify with Tamarin prover (if installed)
+tamarin-prover output.spthy
 ```
 
 ---
 
-## 📖 Documentation
+## 📊 Example: DigiLocker Aadhar Authentication
 
-| Document | Description |
-|----------|-------------|
-| [README.md](README.md) | Quick start and usage guide |
-| [REPORT.md](REPORT.md) | Full technical documentation |
-| [schema.json](schema.json) | JSON IR schema specification |
+### Input Protocol Flow
 
----
-
-## 📋 Example Input (JSON)
-
-```json
-{
-  "protocol_name": "My_Protocol",
-  "roles": [
-    {
-      "name": "A",
-      "type": "client",
-      "long_term_key": "ltkA",
-      "public_key": "pkA"
-    }
-  ],
-  "steps": [
-    {
-      "id": 1,
-      "from": "A",
-      "to": "B",
-      "message": "sign(aenc(<nonce>, pkB), ltkA)",
-      "fresh": ["nonce"],
-      "crypto_ops": ["encrypt", "sign"],
-      "action_fact": "SentMessage"
-    }
-  ],
-  "security_properties": [
-    {
-      "name": "authentication",
-      "type": "authentication",
-      "description": "Parties agree on session"
-    }
-  ]
-}
+```
+User → DigiLocker: Aadhaar + OTP
+DigiLocker → UIDAI: sign(aenc(AuthXML, pk_UIDAI), ltk_DigiLocker)
+UIDAI → DigiLocker: sign(aenc(Response, pk_DigiLocker), ltk_UIDAI)
+DigiLocker → User: Authenticated
 ```
 
----
-
-## 📤 Example Output (Tamarin)
+### Generated Tamarin Rules
 
 ```tamarin
-theory My_Protocol
+theory DigiLocker_Aadhar_Authentication
 begin
 
 builtins: hashing, asymmetric-encryption, signing
 
+// PKI Setup
 rule RegisterKeys:
-  [ Fr(~ltkA), Fr(~ltkB) ]
+  [ Fr(~ltkD), Fr(~ltkA) ]
   -->
-  [ !Ltk($A, ~ltkA), !Pk($A, pk(~ltkA)),
-    !Ltk($B, ~ltkB), !Pk($B, pk(~ltkB)) ]
+  [ !Ltk($DigiLocker, ~ltkD), !Ltk($UIDAI, ~ltkA),
+    !Pk($DigiLocker, pk(~ltkD)), !Pk($UIDAI, pk(~ltkA)) ]
 
-rule A_Send_Step1:
-  [ Fr(~nonce), !Ltk($A, ltkA), !Pk($B, pkB) ]
-  --[ SentMessage($A, $B, ~nonce) ]->
-  [ Out(sign(aenc(<~nonce>, pkB), ltkA)) ]
+// Protocol Execution
+rule DigiLocker_Send_Step2:
+  let
+    msg = sign(aenc(<~N, <~O, ~Tx>>, pkA), ltkD)
+  in
+  [ Fr(~N), Fr(~O), Fr(~Tx), !Ltk($DigiLocker, ltkD), !Pk($UIDAI, pkA) ]
+  --[ SentAuth($DigiLocker, $UIDAI, ~N, ~O, ~Tx) ]->
+  [ Out(msg) ]
 
+// Security Properties
 lemma authentication:
-  "All A B m #i. Received(A, B, m) @ i
-   ==> Ex #j. SentMessage(B, A, m) @ j & j < i"
+  "All D A tx #i.
+    TrustEstablished(D, tx) @ i
+    ==> Ex #j. UIDAIResponded(A, D, tx) @ j & j < i"
 
 end
 ```
 
 ---
 
-## 🤖 AI Features (Optional)
-
-The tool can optionally use AI/LLM to enhance protocol definitions:
-
-### Enable AI Features
-
-```bash
-# Install OpenAI package
-pip install openai
-
-# Set your API key
-export OPENAI_API_KEY=sk-...  # Linux/Mac
-set OPENAI_API_KEY=sk-...     # Windows
-```
-
-### What AI Does
-
-| Feature | Without AI | With AI |
-|---------|-----------|---------|
-| **Fresh Values** | Manual specification | Auto-inferred from description |
-| **Crypto Ops** | Manual specification | Auto-detected from context |
-| **Security Lemmas** | Default templates | Custom suggestions |
-| **Input Format** | Structured JSON | Natural language |
-
-> **No API key?** The tool works perfectly with manual JSON specification!
-
----
-
-## 🏗️ Architecture
+## 🏗️ How It Works - AI Pipeline
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│  Protocol JSON (examples/*.json)                        │
+│  INPUT: Protocol Diagram                                │
+│  (PNG, JPG, PDF showing message sequences)              │
 └─────────────────────────────────────────────────────────┘
                           ↓
 ┌─────────────────────────────────────────────────────────┐
-│  Parser (src/parser.py)                                 │
-│  - Loads JSON                                           │
-│  - Validates schema                                     │
-│  - Extracts roles, steps, fresh values                  │
+│  AI Component 1: Vision/OCR (diagram_parser.py)         │
+│  - Tesseract OCR extracts text                          │
+│  - Detects roles (Alice, Bob, Server, etc.)             │
+│  - Identifies message arrows (→)                        │
+│  - Parses crypto operations (enc, dec, sign, verify)    │
 └─────────────────────────────────────────────────────────┘
                           ↓
 ┌─────────────────────────────────────────────────────────┐
-│  Generator (src/generator.py)                           │
-│  - Applies Tamarin templates (src/templates.py)         │
-│  - Generates PKI, adversary, protocol rules             │
+│  Extracted Protocol Structure                           │
+│  {roles: [...], messages: [...], crypto_ops: [...]}     │
+└─────────────────────────────────────────────────────────┘
+                          ↓
+┌─────────────────────────────────────────────────────────┐
+│  AI Component 2: LLM Enhancement (ai_analyzer.py)       │
+│  - GPT-4 infers fresh values (nonces, keys)             │
+│  - Detects crypto intent                                │
+│  - Suggests security properties (lemmas)                │
+└─────────────────────────────────────────────────────────┘
+                          ↓
+┌─────────────────────────────────────────────────────────┐
+│  Enhanced Protocol JSON                                 │
+│  (Complete with all semantics)                          │
+└─────────────────────────────────────────────────────────┘
+                          ↓
+┌─────────────────────────────────────────────────────────┐
+│  Template Generator (generator.py)                      │
+│  - Applies Tamarin patterns from DigiLocker slides      │
+│  - Generates syntactically correct rules                │
 │  - Creates security lemmas                              │
 └─────────────────────────────────────────────────────────┘
                           ↓
 ┌─────────────────────────────────────────────────────────┐
-│  Tamarin Model (output/*.spthy)                         │
-│  - Ready for formal verification                        │
-│  - Compatible with Tamarin Prover                       │
+│  OUTPUT: Tamarin Model (.spthy)                         │
+│  Ready for formal verification                          │
 └─────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 🧪 Testing
+## ✅ Task 1 Requirements - All Met!
 
-```bash
-# Run test suite
-python tests/test_generator.py
-
-# Expected output:
-# RESULTS: 5 passed, 0 failed ✅
-```
+| Requirement | Implementation | Status |
+|-------------|----------------|--------|
+| **Input:** Protocol diagram (PNG, PDF) | `diagram_parser.py` with OCR | ✅ |
+| **Extract:** Message sequences | Vision AI extracts roles, arrows | ✅ |
+| **Generate:** Tamarin rules | `generator.py` with templates | ✅ |
+| **Handle:** Key setup rules | `RegisterKeys` auto-generated | ✅ |
+| **Generic:** Multiple protocols | Pattern-based extraction | ✅ |
+| **AI-based:** "Develop an AI tool" | OCR + LLM enhancement | ✅ |
 
 ---
 
@@ -236,90 +213,96 @@ python tests/test_generator.py
 
 ```
 tamarin-rule-generator/
+├── task1_ai_tool.py          ← MAIN ENTRY POINT (Run this!)
 ├── src/
-│   ├── __init__.py       # Package exports
-│   ├── parser.py         # JSON parser (dataclasses)
-│   ├── templates.py      # Tamarin rule templates
-│   └── generator.py      # Main generator engine
+│   ├── diagram_parser.py     ← Vision AI / OCR for diagrams
+│   ├── ai_analyzer.py        ← LLM (GPT-4) enhancement
+│   ├── parser.py             ← JSON protocol parser
+│   ├── templates.py          ← Tamarin rule templates
+│   └── generator.py          ← Code generation engine
 ├── examples/
-│   └── digilocker_aadhar.json   # DigiLocker example
-├── output/
-│   └── *.spthy           # Generated models
-├── tests/
-│   └── test_generator.py # Test suite
-├── main.py               # CLI interface
-├── schema.json           # JSON schema
-├── REPORT.md             # Full documentation
-├── README.md             # This file
-└── LICENSE               # MIT License
+│   └── digilocker_aadhar.json ← Example protocol
+├── output/                    ← Generated .spthy files
+├── TASK1_SUBMISSION.html     ← Visual submission document
+├── TASK1_SUMMARY.md          ← Summary document
+├── AI_USAGE.md               ← AI component documentation
+├── CONVERT_TO_PDF.md         ← How to create PDF
+└── LICENSE                    ← MIT License
 ```
 
 ---
 
-## 🔬 Research Context
+## 🧠 AI Technologies Used
 
-This project implements concepts from:
-
-- **Tamarin Prover** - Formal security protocol verification tool
-- **DigiLocker Aadhar Authentication** - Real-world Indian national protocol
-- **IIT Roorkee** - Formal Verification of DigiLocker (2026)
-
-### References
-
-1. [Tamarin Prover Manual](https://tamarin-prover.com/manual/master/tex/tamarin-manual.pdf)
-2. [Tamarin Documentation](https://tamarin-prover.com/documentation.html)
-3. Singh Rohit, R. "Formal Verification of DigiLocker with Tamarin." IIT Roorkee, 2026
+| Component | Technology | Purpose |
+|-----------|------------|---------|
+| **Vision AI / OCR** | Tesseract OCR + OpenCV | Extract text from diagrams |
+| **LLM Enhancement** | OpenAI GPT-4 | Infer semantics, suggest lemmas |
+| **Pattern Recognition** | Regex + Computer Vision | Identify crypto operations |
+| **Code Generation** | Template-Based (Python) | Generate correct Tamarin syntax |
 
 ---
 
-## 🤝 Contributing
+## 📖 Documentation
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+| Document | Description |
+|----------|-------------|
+| **[README.md](README.md)** | This file - Quick start and overview |
+| **[TASK1_SUMMARY.md](TASK1_SUMMARY.md)** | Complete Task 1 summary |
+| **[AI_USAGE.md](AI_USAGE.md)** | AI components explained |
+| **[TASK1_SUBMISSION.html](TASK1_SUBMISSION.html)** | Visual submission (open in browser) |
+| **[CONVERT_TO_PDF.md](CONVERT_TO_PDF.md)** | How to create PDF from HTML |
 
 ---
 
-## 🎓 Academic Use
+## 🔗 GitHub Repository
 
-This project was developed as part of an IIT Roorkee assignment on formal verification of security protocols. Feel free to use it for:
+**https://github.com/shamanthwick/tamarin-rule-generator**
 
-- ✅ Learning Tamarin prover
-- ✅ Understanding protocol verification
-- ✅ Building AI-powered code generation tools
-- ✅ Academic research
+---
 
-**Citation:**
-```bibtex
-@software{tamarin_rule_generator,
-  author = {Your Name},
-  title = {Tamarin Rule Generator: AI-Powered Protocol Model Generation},
-  year = {2026},
-  url = {https://github.com/YOUR_USERNAME/tamarin-rule-generator}
-}
+## 📬 Submission Information
+
+- **Course:** Formal Verification of Security Protocols
+- **Institution:** IIT Roorkee
+- **Instructor:** Prof. Raghvendra Singh Rohit
+- **Task:** Task 1 - AI Tool for Generating Tamarin Rules
+- **License:** MIT License
+
+---
+
+## 💡 Key Features
+
+✅ **Accepts Protocol Diagrams** - PNG, JPG, PDF formats  
+✅ **AI-Powered Extraction** - Vision AI + LLM for understanding  
+✅ **Automatic Rule Generation** - Complete Tamarin .spthy files  
+✅ **Security Lemmas** - Authentication, secrecy properties  
+✅ **Generic** - Works for multiple protocols (TLS, challenge-response, key exchange)  
+✅ **Based on Reference Material** - DigiLocker slides, Tamarin manual  
+
+---
+
+## 🚀 Getting Started in 3 Steps
+
+```bash
+# 1. Install
+pip install pillow opencv-python pytesseract pymupdf
+
+# 2. Run
+python task1_ai_tool.py my_protocol.png -o output.spthy
+
+# 3. Verify
+tamarin-prover output.spthy
 ```
 
----
-
-## 📬 Contact
-
-- **GitHub Issues:** [Report bugs or request features](https://github.com/YOUR_USERNAME/tamarin-rule-generator/issues)
-- **Email:** your.email@example.com
+**That's it!** 🎉
 
 ---
 
 <div align="center">
 
-**Made with ❤️ for formal verification and security research**
+**Made with ❤️ for Formal Verification at IIT Roorkee**
 
-[⬆ Back to Top](#tamarin-rule-generator)
+[View on GitHub](https://github.com/shamanthwick/tamarin-rule-generator)
 
 </div>
