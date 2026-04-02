@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task 1 Submission - AI Tool for Generating Tamarin Rules</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header h2 {
+            font-size: 1.3em;
+            font-weight: normal;
+            opacity: 0.95;
+            margin-bottom: 20px;
+        }
+        
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.9;
+            font-style: italic;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section-title {
+            color: #667eea;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .info-box {
+            background: #f8f9fa;
+            border-left: 5px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .info-box h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .pipeline {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+        }
+        
+        .pipeline-step {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .step-number {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-right: 20px;
+            flex-shrink: 0;
+        }
+        
+        .step-content {
+            flex: 1;
+        }
+        
+        .step-content h4 {
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .arrow {
+            text-align: center;
+            font-size: 2em;
+            color: #667eea;
+            margin: 10px 0;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .feature-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .feature-card h3 {
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+        
+        .feature-card p {
+            opacity: 0.95;
+            font-size: 0.95em;
+        }
+        
+        .code-box {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 25px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .code-box .comment {
+            color: #68d391;
+        }
+        
+        .code-box .keyword {
+            color: #63b3ed;
+        }
+        
+        .code-box .string {
+            color: #f687b3;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+        
+        .table td {
+            padding: 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .table tr:hover {
+            background: #e2e8f0;
+        }
+        
+        .checkmark {
+            color: #48bb78;
+            font-weight: bold;
+            font-size: 1.3em;
+        }
+        
+        .github-box {
+            background: linear-gradient(135deg, #24292e 0%, #0366d6 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 30px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .github-box h3 {
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+        
+        .github-box a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 1.2em;
+            font-weight: bold;
+            display: inline-block;
+            padding: 15px 30px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+        
+        .github-box a:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+        
+        .footer {
+            background: #f8f9fa;
+            padding: 30px 40px;
+            text-align: center;
+            border-top: 3px solid #667eea;
+        }
+        
+        .footer p {
+            color: #666;
+            margin: 5px 0;
+        }
+        
+        .highlight {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+            }
+            
+            .pipeline, .feature-card, .github-box {
+                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .pipeline-step {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .step-number {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🤖 AI Tool for Generating Tamarin Rules</h1>
+            <h2>From Protocol Diagrams to Formal Verification Models</h2>
+            <p class="subtitle">Task 1 Submission - Formal Verification of Security Protocols</p>
+        </div>
+        
+        <!-- Content -->
+        <div class="content">
+            <!-- Introduction -->
+            <div class="section">
+                <h2 class="section-title">📋 Overview</h2>
+                <div class="info-box">
+                    <h3>🎯 Task 1 Objective</h3>
+                    <p>Given a protocol diagram (sequence of rounds), develop an <strong>AI tool</strong> that generates the Tamarin rules for the protocol.</p>
+                    <p style="margin-top: 10px;"><strong>Instructor:</strong> Prof. Raghavendra Singh Rohit, IIT Roorkee</p>
+                </div>
+                
+                <p style="margin-top: 20px;">
+                    This tool automatically converts <span class="highlight">protocol sequence diagrams</span> (PNG, JPG, PDF) into 
+                    <span class="highlight">formal Tamarin verification models</span> (.spthy files) using a hybrid approach combining 
+                    <strong>Computer Vision (OCR)</strong>, <strong>Large Language Models (GPT-4)</strong>, and 
+                    <strong>Template-Based Code Generation</strong>.
+                </p>
+            </div>
+            
+            <!-- AI Pipeline -->
+            <div class="section">
+                <h2 class="section-title">🏗️ AI Pipeline Architecture</h2>
+                <div class="pipeline">
+                    <div class="pipeline-step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>📷 Input: Protocol Diagram</h4>
+                            <p>Accepts protocol diagrams in PNG, JPG, or PDF format showing message sequences between participants (Alice, Bob, Server, etc.)</p>
+                        </div>
+                    </div>
+                    
+                    <div class="arrow">↓</div>
+                    
+                    <div class="pipeline-step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>🧠 AI Component 1: Vision/OCR</h4>
+                            <p><strong>Tesseract OCR + OpenCV</strong> extracts text, detects roles, identifies message arrows (→), and parses cryptographic operations (enc, dec, sign, verify)</p>
+                        </div>
+                    </div>
+                    
+                    <div class="arrow">↓</div>
+                    
+                    <div class="pipeline-step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>🤖 AI Component 2: LLM Enhancement</h4>
+                            <p><strong>GPT-4</strong> infers protocol semantics, detects fresh values (nonces, keys), and suggests security properties (authentication, secrecy lemmas)</p>
+                        </div>
+                    </div>
+                    
+                    <div class="arrow">↓</div>
+                    
+                    <div class="pipeline-step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h4>📝 Template Generator</h4>
+                            <p>Applies Tamarin patterns from DigiLocker slides to generate syntactically correct rules with proper equational theories and action facts</p>
+                        </div>
+                    </div>
+                    
+                    <div class="arrow">↓</div>
+                    
+                    <div class="pipeline-step">
+                        <div class="step-number">5</div>
+                        <div class="step-content">
+                            <h4>✅ Output: Tamarin Model</h4>
+                            <p>Generates complete .spthy file ready for formal verification with Tamarin prover, including all rules and security lemmas</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Key Features -->
+            <div class="section">
+                <h2 class="section-title">✨ Key Features</h2>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h3>📷 Vision AI / OCR</h3>
+                        <p>Extracts protocol structure from diagram images using Tesseract OCR and computer vision</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <h3>🧠 LLM Enhancement</h3>
+                        <p>GPT-4 infers semantics, fresh values, and security properties from extracted text</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <h3>📐 Template-Based</h3>
+                        <p>Reliable rule generation using patterns from DigiLocker formal verification slides</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <h3>🔒 Security Lemmas</h3>
+                        <p>Automatically generates authentication and secrecy properties for verification</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <h3>📄 Multi-Format</h3>
+                        <p>Supports PNG, JPG, PDF diagrams and JSON protocol specifications</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <h3>🧪 Tested & Verified</h3>
+                        <p>5/5 passing tests with example protocols and validation checks</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Usage -->
+            <div class="section">
+                <h2 class="section-title">🚀 How to Use</h2>
+                <div class="code-box">
+<span class="comment"># Step 1: Install dependencies</span>
+pip install pillow opencv-python pytesseract pymupdf openai
+
+<span class="comment"># Step 2: Set API key (optional for AI enhancement)</span>
+export OPENAI_API_KEY=sk-...
+
+<span class="comment"># Step 3: Run the AI tool</span>
+python task1_ai_tool.py protocol_diagram.png -o output.spthy
+
+<span class="comment"># Step 4: Verify with Tamarin</span>
+tamarin-prover output.spthy
+                </div>
+            </div>
+            
+            <!-- Example -->
+            <div class="section">
+                <h2 class="section-title">📊 Example: DigiLocker Aadhar Authentication</h2>
+                
+                <h3 style="color: #667eea; margin: 20px 0 10px 0;">Input (Protocol Flow)</h3>
+                <div class="code-box">
+<span class="keyword">User</span> → <span class="keyword">DigiLocker</span>: Aadhaar + OTP
+<span class="keyword">DigiLocker</span> → <span class="keyword">UIDAI</span>: sign(aenc(AuthXML, pk_UIDAI), ltk_DigiLocker)
+<span class="keyword">UIDAI</span> → <span class="keyword">DigiLocker</span>: sign(aenc(Response, pk_DigiLocker), ltk_UIDAI)
+<span class="keyword">DigiLocker</span> → <span class="keyword">User</span>: Authenticated
+                </div>
+                
+                <h3 style="color: #667eea; margin: 20px 0 10px 0;">Output (Generated Tamarin Rules)</h3>
+                <div class="code-box">
+<span class="keyword">theory</span> DigiLocker_Aadhar_Authentication
+<span class="keyword">begin</span>
+
+<span class="keyword">builtins</span>: hashing, asymmetric-encryption, signing
+
+<span class="comment">// PKI Setup</span>
+<span class="keyword">rule</span> RegisterKeys:
+  [ Fr(~ltkD), Fr(~ltkA) ]
+  -->
+  [ !Ltk($DigiLocker, ~ltkD), !Ltk($UIDAI, ~ltkA),
+    !Pk($DigiLocker, pk(~ltkD)), !Pk($UIDAI, pk(~ltkA)) ]
+
+<span class="comment">// Protocol Execution</span>
+<span class="keyword">rule</span> DigiLocker_Send_Step2:
+  <span class="keyword">let</span>
+    msg = sign(aenc(<~N, <~O, ~Tx>>, pkA), ltkD)
+  <span class="keyword">in</span>
+  [ Fr(~N), Fr(~O), Fr(~Tx), !Ltk($DigiLocker, ltkD), !Pk($UIDAI, pkA) ]
+  --[ SentAuth($DigiLocker, $UIDAI, ~N, ~O, ~Tx) ]->
+  [ Out(msg) ]
+
+<span class="comment">// Security Properties</span>
+<span class="keyword">lemma</span> authentication:
+  <span class="string">"All D A tx #i. TrustEstablished(D, tx) @ i
+   ==> Ex #j. UIDAIResponded(A, D, tx) @ j & j < i"</span>
+
+<span class="keyword">end</span>
+                </div>
+            </div>
+            
+            <!-- Requirements Mapping -->
+            <div class="section">
+                <h2 class="section-title">✅ Task 1 Requirements Mapping</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Requirement</th>
+                            <th>Implementation</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Input:</strong> Protocol diagram (PNG, PDF)</td>
+                            <td><code>diagram_parser.py</code> with OCR</td>
+                            <td><span class="checkmark">✓</span> Complete</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Extract:</strong> Message sequences</td>
+                            <td>Vision AI extracts roles, arrows</td>
+                            <td><span class="checkmark">✓</span> Complete</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Generate:</strong> Tamarin rules</td>
+                            <td><code>generator.py</code> with templates</td>
+                            <td><span class="checkmark">✓</span> Complete</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Handle:</strong> Key setup rules</td>
+                            <td><code>RegisterKeys</code> auto-generated</td>
+                            <td><span class="checkmark">✓</span> Complete</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Generic:</strong> Multiple protocols</td>
+                            <td>Pattern-based extraction</td>
+                            <td><span class="checkmark">✓</span> Complete</td>
+                        </tr>
+                        <tr>
+                            <td><strong>AI-based:</strong> "Develop an AI tool"</td>
+                            <td>OCR + LLM enhancement</td>
+                            <td><span class="checkmark">✓</span> Complete</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- GitHub Repository -->
+            <div class="github-box">
+                <h3>🐙 View Source Code on GitHub</h3>
+                <p style="margin-bottom: 20px; opacity: 0.9;">Complete source code, documentation, examples, and tests available</p>
+                <a href="https://github.com/shamanthwick/tamarin-rule-generator" target="_blank">
+                    🔗 https://github.com/shamanthwick/tamarin-rule-generator
+                </a>
+            </div>
+            
+            <!-- AI Technologies -->
+            <div class="section">
+                <h2 class="section-title">🧠 AI Technologies Used</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Component</th>
+                            <th>Technology</th>
+                            <th>Purpose</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Vision AI / OCR</strong></td>
+                            <td>Tesseract OCR + OpenCV</td>
+                            <td>Extract text from diagrams, detect message flows</td>
+                        </tr>
+                        <tr>
+                            <td><strong>LLM Enhancement</strong></td>
+                            <td>OpenAI GPT-4</td>
+                            <td>Infer semantics, detect fresh values, suggest lemmas</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Pattern Recognition</strong></td>
+                            <td>Regex + Computer Vision</td>
+                            <td>Identify crypto operations, roles, arrows</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Code Generation</strong></td>
+                            <td>Template-Based (Python)</td>
+                            <td>Generate syntactically correct Tamarin rules</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Project Structure -->
+            <div class="section">
+                <h2 class="section-title">📁 Project Structure</h2>
+                <div class="code-box">
+tamarin-rule-generator/
+├── task1_ai_tool.py          ← <span class="keyword">MAIN AI TOOL</span> (Task 1 entry point)
+├── src/
+│   ├── diagram_parser.py     ← <span class="keyword">Vision AI / OCR</span> for diagram parsing
+│   ├── ai_analyzer.py        ← <span class="keyword">LLM (GPT-4)</span> semantic enhancement
+│   ├── parser.py             ← JSON protocol parser
+│   ├── templates.py          ← Tamarin rule templates
+│   └── generator.py          ← Code generation engine
+├── examples/
+│   └── digilocker_aadhar.json ← Example protocol
+├── tests/
+│   └── test_generator.py     ← Test suite (5/5 passing)
+├── README.md                 ← Documentation
+├── AI_USAGE.md               ← AI component details
+├── REPORT.md                 ← Technical report
+└── TASK1_SUMMARY.md          ← Submission summary
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p><strong>Task 1 Submission - Formal Verification of Security Protocols</strong></p>
+            <p>IIT Roorkee | Instructor: Prof. Raghavendra Singh Rohit</p>
+            <p style="margin-top: 20px;">
+                <strong>GitHub Repository:</strong><br>
+                <a href="https://github.com/shamanthwick/tamarin-rule-generator" style="color: #667eea; text-decoration: none;">
+                    https://github.com/shamanthwick/tamarin-rule-generator
+                </a>
+            </p>
+            <p style="margin-top: 20px; font-size: 0.9em; color: #999;">
+                Generated: 2026 | MIT License
+            </p>
+        </div>
+    </div>
+</body>
+</html>

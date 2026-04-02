@@ -1,0 +1,84 @@
+{
+  "protocol_name": "DigiLocker_Aadhar_Authentication",
+  "description": "Aadhar-based authentication protocol for DigiLocker using UIDAI OTP verification",
+  "roles": [
+    {
+      "name": "User",
+      "type": "user",
+      "description": "End user requesting authentication"
+    },
+    {
+      "name": "DigiLocker",
+      "type": "client",
+      "long_term_key": "ltkD",
+      "public_key": "pkD",
+      "description": "DigiLocker service requesting verification"
+    },
+    {
+      "name": "UIDAI",
+      "type": "authority",
+      "long_term_key": "ltkA",
+      "public_key": "pkA",
+      "description": "UIDAI authentication authority"
+    }
+  ],
+  "steps": [
+    {
+      "id": 1,
+      "from": "User",
+      "to": "DigiLocker",
+      "message": "aadhaar_number, OTP",
+      "fresh": ["aadhaar_number", "OTP"],
+      "crypto_ops": [],
+      "action_fact": "UserAuthRequest"
+    },
+    {
+      "id": 2,
+      "from": "DigiLocker",
+      "to": "UIDAI",
+      "message": "sign(aenc(<~N, <~O, ~Tx>>, pkA), ltkD)",
+      "fresh": ["N", "O", "Tx"],
+      "crypto_ops": ["encrypt", "sign"],
+      "action_fact": "SentAuth",
+      "description": "DigiLocker prepares Auth XML, encrypts with UIDAI public key, signs with own private key"
+    },
+    {
+      "id": 3,
+      "from": "UIDAI",
+      "to": "DigiLocker",
+      "message": "sign(aenc(<'y', ~Tx>, pkD), ltkA)",
+      "fresh": [],
+      "crypto_ops": ["decrypt", "verify", "encrypt", "sign"],
+      "action_fact": "UIDAIResponded",
+      "description": "UIDAI decrypts, verifies signature, validates OTP, sends encrypted response"
+    },
+    {
+      "id": 4,
+      "from": "DigiLocker",
+      "to": "User",
+      "message": "authenticated",
+      "fresh": [],
+      "crypto_ops": ["decrypt", "verify"],
+      "action_fact": "TrustEstablished",
+      "description": "DigiLocker verifies UIDAI response and establishes trust"
+    }
+  ],
+  "security_properties": [
+    {
+      "name": "authentication",
+      "type": "authentication",
+      "description": "If DigiLocker trusts user, UIDAI must have responded"
+    },
+    {
+      "name": "secrecy",
+      "type": "secrecy",
+      "description": "Auth XML contents remain secret from adversary"
+    },
+    {
+      "name": "otp_secrecy",
+      "type": "secrecy",
+      "description": "OTP value is never revealed to adversary"
+    }
+  ],
+  "builtins": ["hashing", "asymmetric-encryption", "signing"]
+}
