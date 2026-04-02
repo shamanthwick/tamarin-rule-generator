@@ -255,22 +255,6 @@ tamarin-rule-generator/
 
 ---
 
-## 🔗 GitHub Repository
-
-**https://github.com/shamanthwick/tamarin-rule-generator**
-
----
-
-## 📬 Submission Information
-
-- **Course:** Formal Verification of Security Protocols
-- **Institution:** IIT Roorkee
-- **Instructor:** Prof. Raghvendra Singh Rohit
-- **Task:** Task 1 - AI Tool for Generating Tamarin Rules
-- **License:** MIT License
-
----
-
 ## 💡 Key Features
 
 ✅ **Accepts Protocol Diagrams** - PNG, JPG, PDF formats  
@@ -302,7 +286,5 @@ tamarin-prover output.spthy
 <div align="center">
 
 **Made with ❤️ for Formal Verification at IIT Roorkee**
-
-[View on GitHub](https://github.com/shamanthwick/tamarin-rule-generator)
 
 </div>
