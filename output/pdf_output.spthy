@@ -1,0 +1,107 @@
+// ============================================================
+// Protocol: ltk_DigiLocker) UIDAI_User_Protocol
+// Description: Protocol extracted from diagram
+// Roles: ltk_DigiLocker) UIDAI, User, Alice, a, DigiLocker, UIDAI, [ Out(msg) ] // Security Properties lemma authentication, Server, ~N, ~O, ~Tx) ], A, Bob
+// Steps: 3
+// Security Properties: 2
+// ============================================================
+
+theory ltk_DigiLocker) UIDAI_User_Protocol
+begin
+
+builtins: hashing, asymmetric-encryption, signing
+
+
+// ========== PKI Setup ==========
+rule RegisterKeys:
+  [ Fr(~ltkl), Fr(~ltkU), Fr(~ltkA), Fr(~ltka), Fr(~ltkD), Fr(~ltkU), Fr(~ltk[), Fr(~ltkS), Fr(~ltk~), Fr(~ltkA), Fr(~ltkB) ]
+  -->
+  [ !Ltk($ltk_DigiLocker) UIDAI, ~ltkl), !Ltk($User, ~ltkU), !Ltk($Alice, ~ltkA), !Ltk($a, ~ltka), !Ltk($DigiLocker, ~ltkD), !Ltk($UIDAI, ~ltkU), !Ltk($[ Out(msg) ] // Security Properties lemma authentication, ~ltk[), !Ltk($Server, ~ltkS), !Ltk($~N, ~O, ~Tx) ], ~ltk~), !Ltk($A, ~ltkA), !Ltk($Bob, ~ltkB), !Pk($ltk_DigiLocker) UIDAI, pk(~ltkl)), !Pk($User, pk(~ltkU)), !Pk($Alice, pk(~ltkA)), !Pk($a, pk(~ltka)), !Pk($DigiLocker, pk(~ltkD)), !Pk($UIDAI, pk(~ltkU)), !Pk($[ Out(msg) ] // Security Properties lemma authentication, pk(~ltk[)), !Pk($Server, pk(~ltkS)), !Pk($~N, ~O, ~Tx) ], pk(~ltk~)), !Pk($A, pk(~ltkA)), !Pk($Bob, pk(~ltkB)) ]
+
+
+// ========== Adversary Capabilities ==========
+rule Get_pk:
+  [ !Pk(A, pk) ]
+  -->
+  [ Out(pk) ]
+
+
+rule Reveal_ltk:
+  [ !Ltk(A, ltk) ]
+  --[]->
+  [ Out(ltk) ]
+
+
+// ========== Protocol Execution ==========
+
+// Step 1: User → DigiLocker
+rule User_Send_Step1:
+  let
+  msg = Aadhaar + OTP DigiLocker → UIDAI: sign(aenc(AuthXML, pk_UIDAI),
+in
+[ !Ltk($User, ltkU), !Pk($DigiLocker, pkD) ]
+  -->
+  [ Out(msg) ]
+
+
+rule DigiLocker_Recv_Step1:
+  let
+  // Decrypt and verify incoming message
+in
+[ In(msg), !Ltk($DigiLocker, ltkD), !Pk($User, pkU) ]
+  --[
+  Eq(true, verify(sig, req, pk))
+]->
+  [ [] ]
+
+
+// Step 2: ltk_DigiLocker) UIDAI → DigiLocker
+rule ltk_DigiLocker) UIDAI_Send_Step2:
+  let
+  msg = sign(aenc(Response, pk_DigiLocker), ltk_UIDAI) DigiLocker →
+in
+[ !Ltk($ltk_DigiLocker) UIDAI, ltkl), !Pk($DigiLocker, pkD) ]
+  -->
+  [ Out(msg) ]
+
+
+rule DigiLocker_Recv_Step2:
+  let
+  // Decrypt and verify incoming message
+in
+[ In(msg), !Ltk($DigiLocker, ltkD), !Pk($ltk_DigiLocker) UIDAI, pkl) ]
+  --[
+  Eq(true, verify(sig, req, pk))
+]->
+  [ [] ]
+
+
+// Step 3: ~N, ~O, ~Tx) ] → [ Out(msg) ] // Security Properties lemma authentication
+rule ~N, ~O, ~Tx) ]_Send_Step3:
+  [ !Ltk($~N, ~O, ~Tx) ], ltk~), !Pk($[ Out(msg) ] // Security Properties lemma authentication, pk[) ]
+  -->
+  [ Out("All D A tx #i.) ]
+
+
+rule [ Out(msg) ] // Security Properties lemma authentication_Recv_Step3:
+  [ In(msg), !Ltk($[ Out(msg) ] // Security Properties lemma authentication, ltk[), !Pk($~N, ~O, ~Tx) ], pk~) ]
+  -->
+  [ [] ]
+
+
+// ========== Security Properties ==========
+
+// ========== Security Properties ==========
+lemma authentication:
+  "All D A tx #i.
+    TrustEstablished(D, tx) @ i
+    ==> Ex #j. UIDAIResponded(A, D, tx) @ j & j < i"
+
+
+lemma secrecy:
+  "All A D xml #i.
+    SentAuth(D, A, xml) @ i
+    ==> not (Ex #k. K(xml) @ k)"
+
+
+end
