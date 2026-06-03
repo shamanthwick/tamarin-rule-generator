@@ -1,0 +1,132 @@
+// ============================================================
+// Protocol: DigiLocker_Aadhar_Authentication
+// Description: Aadhar-based authentication protocol for DigiLocker using UIDAI OTP verification
+// Roles: User, DigiLocker, UIDAI
+// Steps: 4
+// Security Properties: 3
+// ============================================================
+
+theory DigiLocker_Aadhar_Authentication
+begin
+
+builtins: hashing, asymmetric-encryption, signing
+
+
+// ========== PKI Setup ==========
+rule RegisterKeys:
+  [ Fr(~ltkD), Fr(~ltkA) ]
+  -->
+  [ !Ltk($DigiLocker, ~ltkD), !Ltk($UIDAI, ~ltkA), !Pk($DigiLocker, pk(~ltkD)), !Pk($UIDAI, pk(~ltkA)) ]
+
+
+// ========== Adversary Capabilities ==========
+rule Get_pk:
+  [ !Pk(A, pk) ]
+  -->
+  [ Out(pk) ]
+
+
+rule Reveal_ltk:
+  [ !Ltk(A, ltk) ]
+  --[]->
+  [ Out(ltk) ]
+
+
+// ========== Protocol Execution ==========
+
+// Step 1: User → DigiLocker
+rule User_Send_Step1:
+  let
+  msg = aadhaar_number, OTP
+in
+[ Fr(~aadhaar_number), Fr(~OTP), !Pk($DigiLocker, pkD) ]
+  --[ UserAuthRequest($User, $DigiLocker, ~aadhaar_number, ~OTP) ]->
+  [ [ Out(msg) ] ]
+
+
+rule DigiLocker_Recv_Step1:
+  [ In(msg), !Ltk($DigiLocker, ltkD) ]
+  --[ UserAuthRequest ]->
+  [ UserAuthRequest($DigiLocker, $User) ]
+
+
+// Step 2: DigiLocker → UIDAI
+rule DigiLocker_Send_Step2:
+  let
+  msg = sign(aenc(<~N, <~O, ~Tx>>, pkA), ltkD)
+in
+[ Fr(~N), Fr(~O), Fr(~Tx), !Ltk($DigiLocker, ltkD), !Pk($UIDAI, pkA) ]
+  --[ SentAuth($DigiLocker, $UIDAI, ~N, ~O, ~Tx) ]->
+  [ [ Out(msg) ] ]
+
+
+rule UIDAI_Recv_Step2:
+  let
+  // Decrypt and verify incoming message
+in
+[ In(msg), !Ltk($UIDAI, ltkA), !Pk($DigiLocker, pkD) ]
+  --[
+  Eq(true, verify(sig, req, pk))
+]->
+  [ SentAuth($UIDAI, $DigiLocker) ]
+
+
+// Step 3: UIDAI → DigiLocker
+rule UIDAI_Send_Step3:
+  let
+  msg = sign(aenc(<'y', ~Tx>, pkD), ltkA)
+in
+[ !Ltk($UIDAI, ltkA), !Pk($DigiLocker, pkD) ]
+  --[ UIDAIResponded($UIDAI, $DigiLocker) ]->
+  [ [ Out(msg) ] ]
+
+
+rule DigiLocker_Recv_Step3:
+  let
+  // Decrypt and verify incoming message
+in
+[ In(msg), !Ltk($DigiLocker, ltkD), !Pk($UIDAI, pkA) ]
+  --[
+  Eq(true, verify(sig, req, pk))
+]->
+  [ UIDAIResponded($DigiLocker, $UIDAI) ]
+
+
+// Step 4: DigiLocker → User
+rule DigiLocker_Send_Step4:
+  let
+  msg = authenticated
+in
+[ !Ltk($DigiLocker, ltkD) ]
+  --[ TrustEstablished($DigiLocker, $User) ]->
+  [ [ Out(msg) ] ]
+
+
+rule User_Recv_Step4:
+  [ In(msg), !Pk($DigiLocker, pkD) ]
+  --[ TrustEstablished ]->
+  [ TrustEstablished($User, $DigiLocker) ]
+
+
+// ========== Security Properties ==========
+
+// ========== Security Properties ==========
+lemma authentication:
+  "All D A tx #i.
+    TrustEstablished(D, tx) @ i
+    ==> Ex #j. UIDAIResponded(A, D, tx) @ j & j < i"
+
+
+lemma secrecy:
+  "All A D xml #i.
+    SentAuth(D, A, xml) @ i
+    ==> not (Ex #k. K(xml) @ k)"
+
+
+lemma otp_secrecy:
+  "All otp #i.
+    UIDAIValidatedOTP(otp) @ i
+    ==> not (Ex #j. K(otp) @ j)"
+
+
+end
